@@ -1,9 +1,11 @@
-from django.http import HttpResponse
-from django.urls import path
+from django.urls import path, include
+from rest_framework import routers
 
-from .views import *
+from .views import UserViewSet
+
+router = routers.DefaultRouter()
+router.register(r'users', UserViewSet)
 
 urlpatterns = [
-    path('users/', lambda r: HttpResponse('<h1> hello, user </h1>')),
-    path('groups/', lambda r: HttpResponse('<h1> hello, group </h1>')),
+    path('', include(router.urls))
 ]
