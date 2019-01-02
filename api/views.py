@@ -1,12 +1,11 @@
 from django.contrib.auth.models import User
-from rest_framework import generics
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters
+from rest_framework import filters, viewsets
 
 from api.serializers import UserSerializer
 
 
-class UserListView(generics.ListAPIView):
+class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     filter_backends = (DjangoFilterBackend, filters.SearchFilter)
