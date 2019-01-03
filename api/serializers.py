@@ -13,6 +13,24 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class CategorySerializer(serializers.ModelSerializer):
+    pk = serializers.ReadOnlyField()
+
     class Meta:
         model = Category
-        fields = ('name', 'user')
+        fields = ('pk', 'name')
+
+    def create(self, validated_data):
+        user = self.context['request'].user
+        category = Category.objects.create(user=user, **validated_data)
+        return category
+
+    def update(self, instance, validated_data):
+        instance.name = validated_data.get('name', instance.name)
+        instance.save()
+        return instance
+
+
+class AdminCategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = ('pk', 'name', 'user')

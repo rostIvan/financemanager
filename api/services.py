@@ -4,7 +4,7 @@ from .models import Category
 
 
 def get_users() -> QuerySet:
-    return User.objects.all()
+    return User.objects.all().order_by('date_joined')
 
 
 def get_user(pk) -> User:
