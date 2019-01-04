@@ -1,6 +1,8 @@
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, viewsets
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
+from rest_framework.response import Response
 
 from api.permissions import IsOwner
 from api.serializers import UserSerializer, CategorySerializer, AdminCategorySerializer
@@ -36,3 +38,28 @@ class CategoriesViewSet(viewsets.ModelViewSet):
         if self.request.user.is_superuser:
             return AdminCategorySerializer
         return CategorySerializer
+
+
+@api_view(['GET'])
+@permission_classes((IsAuthenticated, IsAdminUser))
+def username_list(request):
+    data = (UserSerializer(u).data['username'] for u in get_users())
+    return Response(data)
+
+
+@api_view(['GET'])
+@permission_classes((IsAuthenticated, IsOwner | IsAdminUser))
+def category_list(request):
+    user = request.user
+    if user.is_superuser:
+        data = ({'id': u.id,
+                 'username': u.username,
+                 'categories': serialize_categories_name(u)
+                 } for u in get_users())
+    else:
+        data = serialize_categories_name(user)
+    return Response(data)
+
+
+def serialize_categories_name(user):
+    return (CategorySerializer(c).data['name'] for c in get_categories(user=user))

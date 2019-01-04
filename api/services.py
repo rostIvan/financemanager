@@ -24,6 +24,10 @@ def get_categories(user=None, user_id=None) -> QuerySet:
     return Category.objects.all()
 
 
+def get_token(user):
+    return Token.objects.get(user=user)
+
+
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)
 def create_auth_token(sender, instance=None, created=False, **kwargs):
     if created:
