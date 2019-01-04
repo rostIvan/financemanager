@@ -9,15 +9,15 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('pk', 'username', 'email', 'date_joined', 'password')
+        fields = ('id', 'username', 'email', 'date_joined', 'password')
 
 
 class CategorySerializer(serializers.ModelSerializer):
-    pk = serializers.ReadOnlyField()
+    id = serializers.ReadOnlyField()
 
     class Meta:
         model = Category
-        fields = ('pk', 'name')
+        fields = ('id', 'name')
 
     def create(self, validated_data):
         user = self.context['request'].user
@@ -33,4 +33,4 @@ class CategorySerializer(serializers.ModelSerializer):
 class AdminCategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
-        fields = ('pk', 'name', 'user')
+        fields = ('id', 'name', 'user')
