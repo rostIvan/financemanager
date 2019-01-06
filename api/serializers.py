@@ -5,6 +5,7 @@ from api.models import Category
 
 
 class UserSerializer(serializers.ModelSerializer):
+    id = serializers.ReadOnlyField()
     password = serializers.CharField(write_only=True)
 
     class Meta:
@@ -37,6 +38,8 @@ class CategorySerializer(serializers.ModelSerializer):
 
 
 class AdminCategorySerializer(serializers.ModelSerializer):
+    id = serializers.ReadOnlyField()
+
     class Meta:
         model = Category
         fields = ('id', 'name', 'user')
