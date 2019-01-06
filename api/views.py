@@ -5,8 +5,8 @@ from rest_framework.permissions import IsAdminUser, IsAuthenticated, AllowAny
 from rest_framework.response import Response
 
 from api.permissions import IsOwner
-from api.serializers import UserSerializer, CategorySerializer, AdminCategorySerializer
-from api.services import get_users, get_categories
+from api.serializers import UserSerializer, CategorySerializer, AdminCategorySerializer, TransactionSerializer
+from api.services import get_users, get_categories, get_transactions
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -31,7 +31,7 @@ class CategoriesViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         user = self.request.user
         if user.is_superuser:
-            return get_categories()
+            return self.queryset
         return get_categories(user=user)
 
     def get_serializer_class(self):
@@ -61,6 +61,10 @@ def category_list(request):
     return Response(data)
 
 
+def serialize_categories_name(user):
+    return (CategorySerializer(c).data['name'] for c in get_categories(user=user))
+
+
 @api_view(['POST'])
 @permission_classes((AllowAny,))
 def create_user(request):
@@ -72,5 +76,13 @@ def create_user(request):
         return Response(serialized.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-def serialize_categories_name(user):
-    return (CategorySerializer(c).data['name'] for c in get_categories(user=user))
+class TransactionViewSet(viewsets.ModelViewSet):
+    queryset = get_transactions()
+    serializer_class = TransactionSerializer
+    permission_classes = (IsAuthenticated, IsAdminUser | IsOwner)
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_superuser:
+            return self.queryset
+        return get_transactions(user=user)

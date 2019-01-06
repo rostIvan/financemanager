@@ -5,7 +5,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from rest_framework.authtoken.models import Token
 
-from .models import Category
+from .models import Category, Transaction
 
 
 def get_users() -> QuerySet:
@@ -22,6 +22,14 @@ def get_categories(user=None, user_id=None) -> QuerySet:
     elif user_id:
         return Category.objects.filter(user_id=user_id)
     return Category.objects.all()
+
+
+def get_transactions(user=None, category=None) -> QuerySet:
+    if category:
+        return Transaction.objects.filter(category=category)
+    elif user:
+        return Transaction.objects.filter(category__user=user)
+    return Transaction.objects.all()
 
 
 def get_token(user):
