@@ -48,7 +48,7 @@ class AdminCategorySerializer(serializers.ModelSerializer):
 
 class TransactionSerializer(serializers.ModelSerializer):
     id = serializers.ReadOnlyField()
-    category_name = serializers.CharField(source='category.name')
+    category_name = serializers.CharField(source='category.name', allow_null=True)
 
     class Meta:
         model = Transaction
@@ -81,3 +81,18 @@ def update_category(instance, user, validated_data):
     if category_name:
         category = Category.objects.get_or_create(user=user, name=category_name)[0]
         instance.category = category or instance.category
+
+
+class BasicTransactionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Transaction
+        fields = ('id', 'title', 'description', 'amount', 'datetime')
+
+
+class PrettyTransactionsSerializer(serializers.ModelSerializer):
+    category = serializers.CharField(source='name')
+    transactions = BasicTransactionSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Category
+        fields = ('category', 'transactions')

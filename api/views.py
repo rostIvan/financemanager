@@ -1,11 +1,12 @@
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters, viewsets, status
+from rest_framework import filters, viewsets, status, generics
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAdminUser, IsAuthenticated, AllowAny
 from rest_framework.response import Response
 
 from api.permissions import IsOwner
-from api.serializers import UserSerializer, CategorySerializer, AdminCategorySerializer, TransactionSerializer
+from api.serializers import UserSerializer, CategorySerializer, AdminCategorySerializer, TransactionSerializer, \
+    PrettyTransactionsSerializer
 from api.services import get_users, get_categories, get_transactions
 
 
@@ -86,3 +87,15 @@ class TransactionViewSet(viewsets.ModelViewSet):
         if user.is_superuser:
             return self.queryset
         return get_transactions(user=user)
+
+
+class PrettyTransactionsView(generics.ListAPIView):
+    queryset = get_categories()
+    serializer_class = PrettyTransactionsSerializer
+    permission_classes = (IsAuthenticated, IsAdminUser | IsOwner)
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_superuser:
+            return super(PrettyTransactionsView, self).get_queryset()
+        return get_categories(user=user)
