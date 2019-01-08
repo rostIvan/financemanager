@@ -15,7 +15,7 @@ class UserViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAdminUser,)
 
     filter_backends = (DjangoFilterBackend, filters.SearchFilter)
-    filter_fields = ('username', 'email')
+    filter_fields = ('id', 'username', 'email')
     search_fields = ('username', 'email')
 
 
@@ -25,7 +25,7 @@ class CategoriesViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated, IsAdminUser | IsOwner)
 
     filter_backends = (DjangoFilterBackend, filters.SearchFilter)
-    filter_fields = ('name',)
+    filter_fields = ('id', 'name',)
     search_fields = ('name',)
 
     def get_queryset(self):

@@ -32,7 +32,7 @@ def get_transactions(user=None, category=None) -> QuerySet:
     return Transaction.objects.all()
 
 
-def get_token(user):
+def get_token(user) -> Token:
     return Token.objects.get(user=user)
 
 

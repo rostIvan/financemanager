@@ -63,3 +63,21 @@ class TransactionSerializer(serializers.ModelSerializer):
                                                  amount=validated_data['amount'],
                                                  datetime=validated_data.get('datetime', None))
         return transaction
+
+    def update(self, instance, validated_data):
+        user = self.context['request'].user
+        update_category(instance, user, validated_data)
+        instance.title = validated_data.get('title', instance.title)
+        instance.description = validated_data.get('description', instance.description)
+        instance.amount = validated_data.get('amount', instance.amount)
+        instance.datetime = validated_data.get('datetime', instance.datetime)
+        instance.save()
+        return instance
+
+
+def update_category(instance, user, validated_data):
+    category_name = validated_data.get('category').get('name') \
+        if validated_data.get('category') and validated_data.get('category').get('name') else None
+    if category_name:
+        category = Category.objects.get_or_create(user=user, name=category_name)[0]
+        instance.category = category or instance.category
